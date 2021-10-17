@@ -9,22 +9,22 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-  region = "us-east-1"
+  region = var.availability_zone_1
 }
 
 # Create a VPC
 resource "aws_vpc" "my-vpc" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block = var.vpc_cidr
   tags = {
-    Name = "Demo VPC"
+    Name = var.vpc_name
   }
 }
 
 # Create Web Public Subnet
 resource "aws_subnet" "web-subnet-1" {
   vpc_id                  = aws_vpc.my-vpc.id
-  cidr_block              = "10.0.1.0/24"
-  availability_zone       = "us-east-1a"
+  cidr_block              = var.pub_subnet1_cidr
+  availability_zone       = var.availability_zone_1
   map_public_ip_on_launch = true
 
   tags = {
@@ -34,8 +34,8 @@ resource "aws_subnet" "web-subnet-1" {
 
 resource "aws_subnet" "web-subnet-2" {
   vpc_id                  = aws_vpc.my-vpc.id
-  cidr_block              = "10.0.2.0/24"
-  availability_zone       = "us-east-1b"
+  cidr_block              = var.pub_subnet2_cidr
+  availability_zone       = var.availability_zone_2
   map_public_ip_on_launch = true
 
   tags = {
@@ -43,11 +43,11 @@ resource "aws_subnet" "web-subnet-2" {
   }
 }
 
-# Create Application Public Subnet
+# Create Application Private Subnet
 resource "aws_subnet" "application-subnet-1" {
   vpc_id                  = aws_vpc.my-vpc.id
-  cidr_block              = "10.0.11.0/24"
-  availability_zone       = "us-east-1a"
+  cidr_block              = var.pvt_subnet1_cidr_app
+  availability_zone       = var.availability_zone_1
   map_public_ip_on_launch = false
 
   tags = {
@@ -57,8 +57,8 @@ resource "aws_subnet" "application-subnet-1" {
 
 resource "aws_subnet" "application-subnet-2" {
   vpc_id                  = aws_vpc.my-vpc.id
-  cidr_block              = "10.0.12.0/24"
-  availability_zone       = "us-east-1b"
+  cidr_block              = var.pvt_subnet2_cidr_app
+  availability_zone       = var.availability_zone_2
   map_public_ip_on_launch = false
 
   tags = {
@@ -69,8 +69,8 @@ resource "aws_subnet" "application-subnet-2" {
 # Create Database Private Subnet
 resource "aws_subnet" "database-subnet-1" {
   vpc_id            = aws_vpc.my-vpc.id
-  cidr_block        = "10.0.21.0/24"
-  availability_zone = "us-east-1a"
+  cidr_block        = var.pvt_subnet1_cidr_db
+  availability_zone = var.availability_zone_1
 
   tags = {
     Name = "Database-1a"
@@ -79,21 +79,11 @@ resource "aws_subnet" "database-subnet-1" {
 
 resource "aws_subnet" "database-subnet-2" {
   vpc_id            = aws_vpc.my-vpc.id
-  cidr_block        = "10.0.22.0/24"
-  availability_zone = "us-east-1b"
+  cidr_block        = var.pvt_subnet2_cidr_db
+  availability_zone = var.availability_zone_2
 
   tags = {
     Name = "Database-2b"
-  }
-}
-
-resource "aws_subnet" "database-subnet" {
-  vpc_id            = aws_vpc.my-vpc.id
-  cidr_block        = "10.0.3.0/24"
-  availability_zone = "us-east-1a"
-
-  tags = {
-    Name = "Database"
   }
 }
 
@@ -134,9 +124,9 @@ resource "aws_route_table_association" "b" {
 
 #Create EC2 Instance
 resource "aws_instance" "webserver1" {
-  ami                    = "ami-0d5eff06f840b45e9"
-  instance_type          = "t2.micro"
-  availability_zone      = "us-east-1a"
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
+  availability_zone      = var.availability_zone_1
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-1.id
   user_data              = file("install_apache.sh")
@@ -148,9 +138,9 @@ resource "aws_instance" "webserver1" {
 }
 
 resource "aws_instance" "webserver2" {
-  ami                    = "ami-0d5eff06f840b45e9"
-  instance_type          = "t2.micro"
-  availability_zone      = "us-east-1b"
+  ami                    = var.ami_id
+  instance_type          = var.instance_type
+  availability_zone      = var.availability_zone_2
   vpc_security_group_ids = [aws_security_group.webserver-sg.id]
   subnet_id              = aws_subnet.web-subnet-2.id
   user_data              = file("install_apache.sh")
@@ -304,7 +294,7 @@ resource "aws_db_subnet_group" "default" {
   subnet_ids = [aws_subnet.database-subnet-1.id, aws_subnet.database-subnet-2.id]
 
   tags = {
-    Name = "My DB subnet group"
+    Name = "DB subnet group"
   }
 }
 
