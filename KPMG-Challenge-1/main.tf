@@ -28,7 +28,7 @@ resource "aws_subnet" "web-subnet-1" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "Web-1a"
+    Name = "Web-subnet-1"
   }
 }
 
@@ -39,7 +39,7 @@ resource "aws_subnet" "web-subnet-2" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "Web-2b"
+    Name = "Web-subnet-2"
   }
 }
 
@@ -51,7 +51,7 @@ resource "aws_subnet" "application-subnet-1" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "Application-1a"
+    Name = "Application-subnet-1"
   }
 }
 
@@ -62,7 +62,7 @@ resource "aws_subnet" "application-subnet-2" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name = "Application-2b"
+    Name = "Application-subnet-2"
   }
 }
 
@@ -73,7 +73,7 @@ resource "aws_subnet" "database-subnet-1" {
   availability_zone = var.availability_zone_1
 
   tags = {
-    Name = "Database-1a"
+    Name = "Database-subnet-1"
   }
 }
 
@@ -83,7 +83,7 @@ resource "aws_subnet" "database-subnet-2" {
   availability_zone = var.availability_zone_2
 
   tags = {
-    Name = "Database-2b"
+    Name = "Database-subnet-2"
   }
 }
 
@@ -92,7 +92,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.my-vpc.id
 
   tags = {
-    Name = "Demo IGW"
+    Name = "IGW"
   }
 }
 
@@ -107,7 +107,7 @@ resource "aws_route_table" "web-rt" {
   }
 
   tags = {
-    Name = "WebRT"
+    Name = "Web-RT"
   }
 }
 
@@ -146,7 +146,7 @@ resource "aws_instance" "webserver2" {
   user_data              = file("install_apache.sh")
 
   tags = {
-    Name = "Web Server"
+    Name = "Web-Server"
   }
 
 }
