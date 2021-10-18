@@ -1,6 +1,7 @@
 import requests
 import json
 
+#replace with your instace url
 metadata_url = 'http://169.254.169.254/latest/'
 
 
